@@ -26,6 +26,13 @@
             width: 0px;
             background: transparent;
         }
+        .custom-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 <script type="importmap">
 {
@@ -41,5 +48,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- 显式引入入口文件，确保 Vite 能正确构建 -->
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

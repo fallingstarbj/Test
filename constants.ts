@@ -108,7 +108,7 @@ export const THERAPY_SCENES: TherapyScene[] = [
   {
     id: 'forest',
     title: '静谧森林',
-    description: '通过动态艺术意象，感受晨雾绕林的宁静与生机。',
+    description: '通过极简线条意象，感受微风绕林的宁静与生机。',
     imagePrompt: '',
     audioPrompt: '',
     videoUrl: '', 
