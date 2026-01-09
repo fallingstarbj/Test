@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppTab, AssessmentResult } from './types';
 import Dashboard from './components/Dashboard';
 import Assessment from './components/Assessment';
@@ -8,10 +8,29 @@ import AIAdvisor from './components/AIAdvisor';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.DASHBOARD);
-  const [assessmentHistory, setAssessmentHistory] = useState<(AssessmentResult & { name: string, recommendedSceneId?: string })[]>([]);
+  const [assessmentHistory, setAssessmentHistory] = useState<(AssessmentResult & { name: string, recommendedSceneId?: string, guidance?: string[] })[]>([]);
   const [autoStartSceneId, setAutoStartSceneId] = useState<string | null>(null);
 
-  const handleAssessmentComplete = (score: number, recommendedSceneId?: string, analysis?: string) => {
+  // 从 LocalStorage 加载历史记录
+  useEffect(() => {
+    const saved = localStorage.getItem('railway_heart_history');
+    if (saved) {
+      try {
+        setAssessmentHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse history");
+      }
+    }
+  }, []);
+
+  // 监听并保存历史记录
+  useEffect(() => {
+    if (assessmentHistory.length > 0) {
+      localStorage.setItem('railway_heart_history', JSON.stringify(assessmentHistory));
+    }
+  }, [assessmentHistory]);
+
+  const handleAssessmentComplete = (score: number, recommendedSceneId?: string, analysis?: string, guidance?: string[]) => {
     let level: AssessmentResult['level'] = '优';
     if (score >= 25) level = '高压';
     else if (score >= 20) level = '中度压力';
@@ -23,10 +42,12 @@ const App: React.FC = () => {
       date: new Date().toLocaleString('zh-CN'),
       score: score,
       level: level,
-      recommendation: analysis || '测评完成，建议多接触自然，保持规律作息。',
+      recommendation: analysis || '测评完成，建议多接触自然。',
+      guidance: guidance || [],
       recommendedSceneId: recommendedSceneId
     };
     
+    // 更新状态（这会触发首页重新渲染）
     setAssessmentHistory(prev => [...prev, newEntry]);
     
     if (recommendedSceneId) {
